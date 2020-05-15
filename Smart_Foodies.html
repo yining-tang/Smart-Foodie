@@ -1,0 +1,1209 @@
+﻿
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Smart Foodie</title> <!--Will replace the tag name (html file name you named)-->
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+
+        /* Always set the map height explicitly to define the size of the div
+        * element that contains the map.
+            MUST: Always set the map height explicitly to define the size of the div element that contains the map.
+            set 100% : This will expand to fit the size on mobile devices.
+        */
+        #map {
+            height: 100%;
+            width: 98.6%; /* The width is the width of the web page */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            font-family: Arial, sans-serif;
+            height: 98.5%;
+            margin: 0;
+            padding: 0;
+            transition: background-color .5s;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        .restaurant-search {
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            background: #fff;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            left: 0;
+            position: absolute;
+            top: 100px;
+            width: 440px;
+            z-index: 1;
+        }
+
+        #listing {
+            position: absolute;
+            width: 255px;
+            height: 800px;
+            overflow: auto;
+            left: 1900px;
+            top: 170px;
+            cursor: pointer;
+            overflow-x: hidden;
+        }
+
+        #findRestaurants {
+            font-size: 14px;
+        }
+
+        #locationField {
+            -webkit-box-flex: 1 1 190px;
+            -ms-flex: 1 1 190px;
+            flex: 1 1 190px;
+            margin: 0 8px;
+        }
+
+        #controls {
+            -webkit-box-flex: 1 1 140px;
+            -ms-flex: 1 1 140px;
+            flex: 1 1 140px;
+        }
+
+        #autocomplete {
+            width: 100%;
+        }
+
+        #country {
+            width: 100%;
+        }
+
+        .placeIcon {
+            width: 20px;
+            height: 34px;
+            margin: 4px;
+        }
+
+        .restaurantIcon {
+            width: 24px;
+            height: 24px;
+        }
+
+        #resultsTable {
+            border-collapse: collapse;
+            width: 240px;
+        }
+
+        #rating {
+            font-size: 13px;
+            font-family: Arial Unicode MS;
+        }
+
+        .iw_table_row {
+            height: 18px;
+        }
+
+        .iw_attribute_name {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .iw_table_icon {
+            text-align: right;
+        }
+
+        /* Makes the sample page fill the window.
+           MUST: Specifically declare those percentages for <body> and <html> as well.
+        */
+
+        /* Style the header */
+        header {
+            background-color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 50px;
+            word-spacing: 25px;
+            top: 0;
+            padding-left: 370px;
+            padding-right: 200px;
+            width: 60%; /* Full width */
+            transition: 0.2s; /* Add a transition effect (when scrolling - and font size is decreased) */
+            color:#BE2026;/*alevioletred*/
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: white;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+            .sidenav a {
+                padding: 10px 10px 8px 10px;
+                text-decoration: none;
+                font-size: 18px;
+                color: #818181;
+                display: block;
+                transition: 0.3s;
+            }
+
+                .sidenav a:hover {
+                    color: #f1f1f1;
+                }
+
+            .sidenav .closebtn {
+                position: absolute;
+                top: 0;
+                right: 25px;
+                font-size: 36px;
+                margin-left: 50px;
+            }
+
+        #map {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+
+        #header {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+
+        @media screen and (max-height: 450px) {
+            .sidenav {
+                padding-top: 15px;
+            }
+
+                .sidenav a {
+                    font-size: 18px;
+                }
+        }
+        /* The container; the content after checkbox  */
+            .container {
+            display: block;
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            /* Hide the browser's default checkbox */
+            .container input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+                background-color: #eee;
+            }
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 20px;
+            height: 20px;
+            width: 20px;
+            background-color: #d1d1d1;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .container:hover input ~ .checkmark {
+            background-color: #d1d1d1;
+        }
+
+        /* When the checkbox is checked, add a blue background */
+        .container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the checkmark when checked */
+        .container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Style the checkmark/indicator */
+        .container .checkmark:after {
+            left: 6px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        input[type=text], select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .submit {
+            width: 35%;
+            background-color: limegreen;
+            color: white;
+            padding: 14px 20px;
+            margin: 100px 80px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .submit:hover {
+                background-color: #45a049;
+            }
+
+        /*the container must be positioned relative:*/
+        .custom-select {
+            position: relative;
+            font-family: Arial;
+            left: 6px;
+            margin: 10px 5px;
+            margin-right: 20px;
+        }
+
+            .custom-select select {
+                display: none; /*hide original SELECT element:*/
+            }
+
+        .select-selected {
+            background-color: DodgerBlue;
+        }
+
+            /*style the arrow inside the select element:*/
+            .select-selected:after {
+                position: absolute;
+                content: "";
+                top: 14px;
+                right: 10px;
+                width: 0;
+                height: 0;
+                border: 6px solid transparent;
+                border-color: #fff transparent transparent transparent;
+            }
+
+            /*point the arrow upwards when the select box is open (active):*/
+            .select-selected.select-arrow-active:after {
+                border-color: transparent transparent #fff transparent;
+                top: 7px;
+            }
+
+        /*style the items (options), including the selected item:*/
+        .select-items div, .select-selected {
+            color: #ffffff;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /*style items (options):*/
+        .select-items {
+            position: absolute;
+            background-color: DodgerBlue;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+        }
+
+        /*hide the items when the select box is closed:*/
+        .select-hide {
+            display: none;
+        }
+
+        .select-items div:hover, .same-as-selected {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+
+
+        input[type="text"] {
+            font-size: 13px;
+            padding: 8px 5px;
+        }
+
+        label {
+            padding: 0px 12px 0px 0;
+            display: inline-block;
+        }
+
+        .col-review, .col-rating {
+            margin-left: 110px;
+            /*float: right;*/
+            width: 35%;
+            margin-top: 0px;
+        }
+        /* Clear floats after the columns */
+        .review:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+        @media screen and (max-width: 600px) {
+            .col-review, .col-rating, input[type=submit] {
+                width: 100%;
+                margin-top: 0;
+            }
+        }
+
+
+        .btn-group button {
+            margin-left: 14px;
+            background-color: lightgrey; /* Green background #4CAF50*/
+            border: none; /* Green border */
+            color: black; /* White text */
+            padding: 10px 24px; /* Some padding */
+            cursor: pointer; /* Pointer/hand icon */
+            float: left; /* Float the buttons side by side */
+            margin-bottom: 5px;
+        }
+
+        /* Clear floats (clearfix hack) */
+        .btn-group:after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .btn-group button:not(:last-child) {
+            border-right: none; /* Prevent double borders */
+        }
+
+        /* Add a background color on hover */
+        .btn-group button:hover {
+            background-color: DodgerBlue;
+            border: 1px solid gray;
+        }
+
+
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 13px;
+        }
+
+            .active, .collapsible:hover {
+                background-color: #555;
+            }
+
+            .collapsible:after {
+                content: '\02795'; /* Unicode character for "plus" sign (+) */
+                font-size: 10px;
+                color: DodgerBlue;
+                float: right;
+                margin-left: 10px;
+            }
+
+        .active:after {
+            content: "\2796"; /* Unicode character for "minus" sign (-) */
+        }
+
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f1f1;
+            width: 220px;
+        }
+
+        .buttonSet {
+            width: 100px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin: 0 0 5px 0;
+        }
+
+        #more {
+            width: 100%;
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="header">
+        <header><b>Smart Foodies</b></header>
+        <span style="        font-size: 30px;
+        background-color: orange;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: dimgray;
+        cursor: pointer" onclick="openNav()">&#9776; <b>Filter</b></span>
+    </div>
+    <!--For the map to display on a web page, we must reserve a spot for it.
+      Commonly, we do this by creating a named div element and obtaining a reference to this element in the browser's document object model (DOM).
+    -->
+
+
+    <div id="map"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Filter</span></div>
+
+    <div id="listing">
+        <h2>Results</h2>
+        <table id="resultsTable">
+            <tbody id="results"></tbody>
+        </table>
+        <button id="more">More results</button>
+    </div>
+
+    <div style="display: none">
+        <div id="info-content">
+            <table>
+                <tr id="iw-url-row" class="iw_table_row">
+                    <td id="iw-icon" class="iw_table_icon"></td>
+                    <td id="iw-url"></td>
+                </tr>
+                <tr id="iw-duration-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Drive Time:</td>
+                    <td id="iw-duration"></td>
+                    
+                </tr>
+                   
+                <tr id="iw-price_level-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Price:</td>
+                    <td id="iw-price_level"></td>
+                </tr>
+                <tr id="iw-rating-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Rating:</td>
+                    <td id="iw-rating"></td>
+                </tr>
+                <tr id="iw-user_ratings_total-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Review:</td>
+                    <td id="iw-user_ratings_total"></td>
+                </tr>
+                <tr id="iw-phone-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Telephone:</td>
+                    <td id="iw-phone"></td>
+                </tr>
+                <tr id="iw-address-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Address:</td>
+                    <td id="iw-address"></td>
+                </tr>
+                <tr id="iw-website-row" class="iw_table_row">
+                    <td class="iw_attribute_name">Website:</td>
+                    <td id="iw-website"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="mySidenav" class="sidenav">
+
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="#start">*** Start point</a>
+        <div class="restaurant-search">
+            <div id="locationField">
+                <input id="autocomplete" placeholder="Enter a location" type="text" />
+            </div>
+
+            <div id="controls">
+                <select id="country">
+                    <option value="all">All</option>
+                    <option value="us" selected>U.S.A.</option>
+                    <option value="uk">United Kingdom</option>
+                </select>
+            </div>
+        </div>
+        <h5 style="margin-left: 40px;margin-top: 50px;margin-bottom: 5px;">
+            <i>-----------------------------------</i><br>
+            <i>Below fields are optional</i><br>
+            <i>-----------------------------------</i>
+        </h5>
+
+        
+
+        <a href="#when"></a>
+
+        <div class="btn-group">
+
+           
+
+            <div class="btn-Other" style="width:150px;">
+                
+                <div class="content">
+                    <form id="rateForm">
+                        <div class="col-rating">
+                            <label for="reviewNum"></label>
+                            <input type="datetime-local" id="myLocalDate" value="Intl.DateTimeFormat().resolvedOptions().timeZone" style="width:150px;float:right; margin-bottom:15px;">
+                            <button class="buttonSet">Set</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <a href="#price">Price range</a>
+        <label class="container">
+            $
+            <input type="checkbox" name="price" value="$" checked="checked" id="1">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">
+            $$
+            <input type="checkbox" name="price" value="$$" checked="checked" id="2">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">
+            $$$
+            <input type="checkbox" name="price" value="$$$" checked="checked" id="3">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">
+            $$$$
+            <input type="checkbox" name="price" value="$$$$" checked="checked" id="4">
+            <span class="checkmark"></span>
+        </label>
+        <div class="review">
+            <a href="#review">Review  >=</a>
+            <form id="reviewForm">
+                <div class="col-review">
+                    <label for="reviewNum"></label>
+                    <input type="text" id="reviewNum" name="reviewNum" placeholder="Multiples of 100" style="width:105px;float:left;">
+                </div>
+            </form>
+        </div>
+
+        <div class="rate">
+            <a href="#rate">Rate  >=</a>
+            <form id="rateForm">
+                <div class="col-rating">
+                    <label for="reviewNum"></label>
+                    <input type="text" id="ratePoint" name="ratePoint" placeholder="0.0 - 5.0" style="width:60px;float:left;">
+                </div>
+            </form>
+        </div>
+        
+        <button class="submit" onclick="emptySearch()">Search</button>
+
+    </div>
+
+    <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
+
+    <script>
+        var x, i, j, selElmnt, a, b, c;
+        /*look for any elements with the class "custom-select":*/
+        x = document.getElementsByClassName("custom-select");
+        for (i = 0; i < x.length; i++) {
+            selElmnt = x[i].getElementsByTagName("select")[0];
+            /*for each element, create a new DIV that will act as the selected item:*/
+            a = document.createElement("DIV");
+            a.setAttribute("class", "select-selected");
+            a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+            x[i].appendChild(a);
+            /*for each element, create a new DIV that will contain the option list:*/
+            b = document.createElement("DIV");
+            b.setAttribute("class", "select-items select-hide");
+            for (j = 1; j < selElmnt.length; j++) {
+                /*for each option in the original select element,
+                create a new DIV that will act as an option item:*/
+                c = document.createElement("DIV");
+                c.innerHTML = selElmnt.options[j].innerHTML;
+                c.addEventListener("click", function (e) {
+                    /*when an item is clicked, update the original select box,
+                    and the selected item:*/
+                    var y, i, k, s, h;
+                    s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+                    h = this.parentNode.previousSibling;
+                    for (i = 0; i < s.length; i++) {
+                        if (s.options[i].innerHTML == this.innerHTML) {
+                            s.selectedIndex = i;
+                            h.innerHTML = this.innerHTML;
+                            y = this.parentNode.getElementsByClassName("same-as-selected");
+                            for (k = 0; k < y.length; k++) {
+                                y[k].removeAttribute("class");
+                            }
+                            this.setAttribute("class", "same-as-selected");
+                            break;
+                        }
+                    }
+                    h.click();
+                });
+                b.appendChild(c);
+            }
+            x[i].appendChild(b);
+            a.addEventListener("click", function (e) {
+                /*when the select box is clicked, close any other select boxes,
+                and open/close the current select box:*/
+                e.stopPropagation();
+                closeAllSelect(this);
+                this.nextSibling.classList.toggle("select-hide");
+                this.classList.toggle("select-arrow-active");
+            });
+        }
+        function closeAllSelect(elmnt) {
+            /*a function that will close all select boxes in the document,
+            except the current select box:*/
+            var x, y, i, arrNo = [];
+            x = document.getElementsByClassName("select-items");
+            y = document.getElementsByClassName("select-selected");
+            for (i = 0; i < y.length; i++) {
+                if (elmnt == y[i]) {
+                    arrNo.push(i)
+                } else {
+                    y[i].classList.remove("select-arrow-active");
+                }
+            }
+            for (i = 0; i < x.length; i++) {
+                if (arrNo.indexOf(i)) {
+                    x[i].classList.add("select-hide");
+                }
+            }
+        }
+        /*if the user clicks anywhere outside the select box,
+        then close all select boxes:*/
+        document.addEventListener("click", closeAllSelect);
+    </script>
+
+
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++)
+        {
+            coll[i].addEventListener("click", function ()
+            {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        }
+    </script>
+
+    <!-- Below uses the autocomplete feature of the Google Places API.
+    It allows the user to find all restaurants in a given place, within a given
+     country. It then displays markers for all the restaurant returned,
+     with on-click details for each restaurant.
+    -->
+    <script>
+        var map, places, infoWindow;
+        var markers = [];
+        var autocomplete;
+        var countryRestrict = { 'country': 'us' };
+        var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
+        var hostnameRegexp = new RegExp('^https?://.+?/');
+
+        var countries =
+        {
+            'us': {
+                center: { lat: 37.1, lng: -95.7 },
+                zoom: 3
+            },
+            'uk': {
+                center: { lat: 54.8, lng: -4.6 },
+                zoom: 5
+            }
+        };
+
+        function initMap()
+        {
+            map = new google.maps.Map(document.getElementById('map'),
+            {
+                zoom: countries['us'].zoom,
+                center: countries['us'].center,
+                mapTypeControl: false,
+                panControl: false,
+                zoomControl: false,
+                streetViewControl: false
+            });
+
+            infoWindow = new google.maps.InfoWindow(
+            {
+                content: document.getElementById('info-content')
+            });
+
+            // Create the autocomplete object and associate it with the UI input control.
+            // Restrict the search to the input address.
+            autocomplete = new google.maps.places.Autocomplete(
+                /* @type {!HTMLInputElement} */
+                (document.getElementById('autocomplete')),
+                {
+                types: ['geocode'],
+                componentRestrictions: countryRestrict
+                }
+            );
+
+            places = new google.maps.places.PlacesService(map);
+            autocomplete.addListener('place_changed', onPlaceChanged);
+            // Add a DOM event listener to react when the user selects a country.
+            document.getElementById('country').addEventListener('change', setAutocompleteCountry);
+        }
+        
+        // When the user enter a location, get the place details for the location and
+        // zoom the map in on the location.
+        var startAddress;
+        function onPlaceChanged()
+        {
+            var place = autocomplete.getPlace();
+            if (place.geometry) {
+                map.panTo(place.geometry.location);
+                map.setZoom(15);
+                search();
+                startAddress = place.geometry.location;
+            }
+            else {document.getElementById('autocomplete').placeholder = 'Enter a location';}
+        }
+
+        //Get input values from sidebar 
+        var time, timeSeleted, reviewNum, ratingPoints; 
+        let priceValue = [];
+        var priceNum = [];
+        function getValues()
+        {
+
+            //get value for price range check box
+            const checkboxes = document.querySelectorAll('input[name="price"]:checked');
+            checkboxes.forEach((checkbox) => { priceValue.push(checkbox.value); });
+            priceNum = [];
+            checkboxes.forEach((checkbox) => { priceNum.push(checkbox.id); });
+             //get value for review
+            reviewNum = document.getElementById('reviewNum').value;
+             //get value for rating
+            ratingPoints = document.getElementById('ratePoint').value;
+             
+            
+        }
+        
+        function emptySearch() {
+            dTime = [];
+           
+            clearResults();
+            clearMarkers();
+            search();
+        }
+
+        // Search for restaurants in the selected location, within the viewport of the map.
+        var page1 = 0;
+        var fieldCount = 0;
+        var number = 0;
+        let driveTime = 0;
+        var dTime = {};
+        var index = 0;
+        var searchedPlaces = [];
+        var placeName;
+        function search()
+        { 
+            getValues();
+            service = new google.maps.DistanceMatrixService(); // instantiate Distance Matrix service
+            var search = {
+                bounds: map.getBounds(),
+                types: ['restaurant']
+            };
+            var page = 0;
+            page1 = 0;
+
+            
+            places.nearbySearch(search, function (results, status, pagination)
+            {
+
+                if (status === google.maps.places.PlacesServiceStatus.OK)
+                {
+                    dTime = {};
+                    clearMarkers();
+                    clearResults();
+                    var getNextPage = null;
+                    var moreButton = document.getElementById('more');
+                    moreButton.onclick = function ()
+                    {
+                        moreButton.disabled = true;
+                        if (getNextPage) getNextPage();
+                    };
+                    console.log(results)
+                    moreButton.disabled = !pagination.hasNextPage;
+
+                    // Create a marker for each restaurant found, and
+                    // assign a letter of the alphabetic to each marker icon.
+                    for (var i = 0; i < results.length; i++)
+                    {
+                        matrixOptions = {
+                            
+                            origins: [startAddress],// start address
+                            destinations: [results[i].geometry.location], // resturant address
+                            travelMode: 'DRIVING',
+                            unitSystem: google.maps.UnitSystem.IMPERIALi
+                        };
+                        
+                            
+                        if (results[i].vicinity.lastIndexOf('Avenue')!=-1)
+                        { searchedPlaces[i] = results[i].vicinity.substring(0, results[i].vicinity.lastIndexOf('Avenue') + 6)}
+                        else if (results[i].vicinity.lastIndexOf('Drive') != -1)
+                        { searchedPlaces[i] = results[i].vicinity.substring(0, results[i].vicinity.lastIndexOf('Drive') + 5)}
+                        else if (results[i].vicinity.lastIndexOf('Road') != -1)
+                        { searchedPlaces[i] = results[i].vicinity.substring(0, results[i].vicinity.lastIndexOf('Road') + 4) }
+                        else if (results[i].vicinity.lastIndexOf('Street') != -1)
+                        { searchedPlaces[i] = results[i].vicinity.substring(0, results[i].vicinity.lastIndexOf('Street') + 6)}
+                        else
+                        { searchedPlaces[i] = results[i].vicinity.substring(0, results[i].vicinity.indexOf(',')) }
+
+
+
+                        console.log(searchedPlaces)
+                        
+                        
+                        // Call Distance Matrix service
+                        service.getDistanceMatrix(matrixOptions, callback);
+                        // Callback function used to process Distance Matrix response
+                        function callback(response, status) {
+                            if (status !== "OK") {
+                                alert("Error with distance matrix");
+                                return;
+                            }
+                            console.log(response);
+                            if (response.destinationAddresses[0]) {
+                                
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("St", "Street")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("E", "East")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace(/ S /, " South ")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("N", "North")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("W", "West")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("Dr", "Drive")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("Ave", "Avenue")
+                                response.destinationAddresses[0] = response.destinationAddresses[0].replace("Rd", "Road")
+                                
+                                
+                            };
+                            placeName = response.destinationAddresses[0].substring(0, response.destinationAddresses[0].indexOf(','));
+                            console.log(response.destinationAddresses[0]);
+                            console.log(placeName);
+                            driveTime = 0;
+                            //dTime = 0;
+                            number = 0;
+                            fieldCount = 0;
+
+                            number = ((response.rows[0].elements[0].duration.value) / 60).toFixed(1);
+                            driveTime = response.rows[0].elements[0].duration.text;
+                            dTime[placeName] = number;
+
+                            console.log(response);
+                            console.log(number);
+                            console.log(driveTime);
+
+                            
+                        }
+
+                        
+
+                        if (fieldCount == 0 && priceNum.length != 4) {
+                            var match = 0;
+
+                            console.log(searchedPlaces[i])
+                            console.log(dTime[searchedPlaces[i]])
+                            for (var x = 0; x < priceNum.length; x++) {
+                                
+                                
+                                if (results[i].price_level == priceNum[x]) { match = 1; }
+                                
+                            }
+                            if (match != 1) { fieldCount++;  }
+
+                        }
+                        console.log(dTime)
+  
+                        if (fieldCount == 0 && reviewNum != 0) {
+                            if (results[i].user_ratings_total < reviewNum) {
+                                
+                                fieldCount++;
+                            }
+                        }
+                        if (fieldCount == 0 && reviewNum != 0) {
+                            if (results[i].user_ratings_total < reviewNum) {
+                                
+                                fieldCount++;                                
+                            }
+                        }
+                        if (fieldCount == 0 && ratingPoints != 0) { 
+                            if (results[i].rating < ratingPoints) {
+                                fieldCount++;
+                            }
+                        }
+                        if (fieldCount == 0) {
+                            
+
+                            markers[i] = new google.maps.Marker({
+                                position: results[i].geometry.location,
+                                animation: google.maps.Animation.DROP,
+                                icon: 'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=' + (i + 1 + page * 20) + '|FF776B|000000'
+                            });
+
+                            // If the user clicks a restaurant marker, show the details of that restaurant
+                            // in an info window.
+                            markers[i].placeResult = results[i];
+                            google.maps.event.addListener(markers[i], 'click', showInfoWindow);
+                            setTimeout(dropMarker(i), i * 100);
+                            addResult(results[i], i);
+
+                        }
+                        
+                        fieldCount = 0;
+                        
+                        
+                    }  
+                    getNextPage = pagination.hasNextPage && function () {
+                        pagination.nextPage();
+                        page++;
+                        page1++;
+                    };
+                }
+            });
+        }
+
+        function clearMarkers()
+        {
+
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i]) {
+                    markers[i].setMap(null);
+                }
+            }
+            markers = [];
+        }
+
+
+        // Set the country restriction based on user input.
+        // Also center and zoom the map on the given country.
+        function setAutocompleteCountry()
+        {
+            var country = document.getElementById('country').value;
+            if (country == 'all') {
+                autocomplete.setComponentRestrictions({ 'country': [] });
+                map.setCenter({ lat: 15, lng: 0 });
+                map.setZoom(2);
+            }
+            else {
+                autocomplete.setComponentRestrictions({ 'country': country });
+                map.setCenter(countries[country].center);
+                map.setZoom(countries[country].zoom);
+            }
+            clearResults();
+            clearMarkers();
+        }
+
+        function dropMarker(i)
+        {
+            return function () {markers[i].setMap(map);};
+        }
+        //add results on the right side "Results" part
+        function addResult(result, i)
+        {
+            var results = document.getElementById('results');
+            var markerIcon = 'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=' + (i + 1 + page1 * 20) + '|FF776B|000000';
+
+            var tr = document.createElement('tr');
+            tr.style.backgroundColor = (i % 2 === 0 ? '#F0F0F0' : '#FFFFFF');
+            tr.onclick = function () {google.maps.event.trigger(markers[i], 'click');};
+
+            var iconTd = document.createElement('td');
+            var nameTd = document.createElement('td');
+            var icon = document.createElement('img');
+            icon.src = markerIcon;
+            icon.setAttribute('class', 'placeIcon');
+            icon.setAttribute('className', 'placeIcon');
+            var name = document.createTextNode(result.name);
+            iconTd.appendChild(icon);
+            nameTd.appendChild(name);
+            tr.appendChild(iconTd);
+            tr.appendChild(nameTd);
+            results.appendChild(tr);
+        }
+
+        function clearResults()
+        {
+            var results = document.getElementById('results');
+            while (results.childNodes[0]) { results.removeChild(results.childNodes[0]); }
+        }
+
+        // Get the place details for a restaurant. Show the information in an info window,
+        // anchored on the marker for the restaurant that the user selected.
+        function showInfoWindow()
+        {
+            var marker = this;
+            places.getDetails({ placeId: marker.placeResult.place_id },
+                function (place, status)
+                {
+                    if (status !== google.maps.places.PlacesServiceStatus.OK) {return;}
+                    infoWindow.open(map, marker);
+                    buildIWContent(place);
+                });
+        }
+
+        // Load the place information into the HTML elements used by the info window.
+        function buildIWContent(place)
+        {
+            console.log(place)
+            document.getElementById('iw-icon').innerHTML = '<img class="restaurantIcon" ' +
+                'src="' + place.icon + '"/>';
+            document.getElementById('iw-url').innerHTML = '<b><a href="' + place.url +
+                '">' + place.name + '</a></b>';
+            document.getElementById('iw-address').textContent = place.vicinity;
+
+            if (place.formatted_phone_number) {
+                document.getElementById('iw-phone-row').style.display = '';
+                document.getElementById('iw-phone').textContent =
+                    place.formatted_phone_number;
+            } else {
+                document.getElementById('iw-phone-row').style.display = 'none';
+            }
+
+            // Assign a five-star rating to the restaurant, using a black star ('&#10029;')
+            // to indicate the rating the restaurant has earned, and a white star ('&#10025;')
+            // for the rating points not achieved.
+            if (place.rating) {
+                var ratingHtml = '';
+                for (var i = 0; i < 5; i++) {
+                    if (place.rating < (i + 0.5)) {
+                        ratingHtml += '&#10025;';
+                    } else {
+                        ratingHtml += '&#10029;';
+                    }
+                    document.getElementById('iw-rating-row').style.display = '';
+                    document.getElementById('iw-rating').innerHTML = ratingHtml + "    " + place.rating;
+                }
+            } else {
+                document.getElementById('iw-rating-row').style.display = 'none';
+            }
+
+            // The regexp isolates the first part of the URL (domain plus subdomain)
+            // to give a short URL for displaying in the info window.
+            if (place.website) {
+                var fullUrl = place.website;
+                var website = hostnameRegexp.exec(place.website);
+                if (website === null) {
+                    website = 'http://' + place.website + '/';
+                    fullUrl = website;
+                }
+                document.getElementById('iw-website-row').style.display = '';
+                document.getElementById('iw-website').textContent = website;
+
+            } else {
+                document.getElementById('iw-website-row').style.display = 'none';
+            }
+
+            if (place.user_ratings_total) {
+                document.getElementById('iw-user_ratings_total-row').style.display = '';
+                document.getElementById('iw-user_ratings_total').textContent = place.user_ratings_total;
+            }
+            else {
+                document.getElementById('iw-user_ratings_total-row').style.display = 'none';
+            }
+
+            if (place.price_level) {
+                var priceHtml = '';
+                for (var i = 0; i < place.price_level; i++) {
+                    priceHtml += '&#36';
+                }
+                document.getElementById('iw-price_level-row').style.display = '';
+                document.getElementById('iw-price_level').innerHTML = priceHtml;
+            }
+            else {
+                document.getElementById('iw-price_level-row').style.display = 'none';
+            }
+            if (dTime) {
+                console.log(place.vicinity)
+
+                if (place.vicinity.lastIndexOf('Avenue') != -1) {
+                    place.vicinity = place.vicinity.substring(0, place.vicinity.lastIndexOf('Avenue') + 6)
+                }
+                else if (place.vicinity.lastIndexOf('Drive') != -1) 
+                {
+                    place.vicinity = place.vicinity.substring(0, place.vicinity.lastIndexOf('Drive') + 5)
+                }
+                else if (place.vicinity.lastIndexOf('Road') != -1) {
+                    place.vicinity = place.vicinity.substring(0, place.vicinity.lastIndexOf('Road') + 4)
+                }
+                else if (place.vicinity.lastIndexOf('Street') != -1) {
+                    place.vicinity = place.vicinity.substring(0, place.vicinity.lastIndexOf('Street') + 6 )
+                }
+                else { place.vicinity = place.vicinity.substring(0, place.vicinity.indexOf(','))}
+
+
+                console.log(place.vicinity)
+               
+                console.log(dTime[place.vicinity])
+                if (dTime[place.vicinity]) {
+                    document.getElementById('iw-duration-row').style.display = '';
+                    document.getElementById('iw-duration').textContent = dTime[place.vicinity] + "    mins";
+                }
+                else { document.getElementById('iw-duration').textContent = "Current data not avaliable";}
+            }
+            else {
+                document.getElementById('iw-duration').style.display = 'none';
+            }
+            
+        }
+    </script>
+
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+            document.getElementById("map").style.marginLeft = "250px";
+            document.getElementById("header").style.marginLeft = "250px";
+            document.body.style.backgroundColor = "	orange";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.getElementById("map").style.marginLeft = "0";
+            document.getElementById("header").style.marginLeft = "250px";
+            document.body.style.backgroundColor = "white";
+        }
+    </script>
+    <!--Load the API from the specified URL
+    * The async attribute allows the browser to render the page while the API loads
+    * The callback parameter executes the initMap() function
+    -->
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC-qfgm6TWiThFhTC4u48-MzBCZfd2iPuM&libraries=places&callback=initMap">
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/place/findplacefromtext/json?parameters&callback=initMap">
+    </script>
+ 
+</body>
+</html>
