@@ -5,10 +5,10 @@ I use Google Maps several times a day before coronavirus spreading, to check whe
 ```
 Here are some aspects I noticed:
 
-    -- So far, google map unable to display nearby locations to a searched location (start point) at the same time. Users have to change        the pin to each destination location to check drive time.  
-    -- And it could not shows the details of this destination (ie: Customer Rating, Number of reviews, Price level, etc) at the same            time.
-    -- The current google map only allows users to filter the results by select Customer Rating between 3.5, 4.0, and 4.5.
-    -- The user is unable to filter the results by input or select a number of Total reviews.
+-- So far, google map unable to display nearby locations to a searched location (start point) at the same time. Users have to change the pin to each destination location to check drive time.  
+-- And it could not shows the details of this destination (ie: Customer Rating, Number of reviews, Price level, etc) at the same time.
+-- The current google map only allows users to filter the results by select Customer Rating between 3.5, 4.0, and 4.5.
+-- The user is unable to filter the results by input or select a number of Total reviews.
 ```
 
 ## Introduction
