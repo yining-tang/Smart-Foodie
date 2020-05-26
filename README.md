@@ -15,6 +15,7 @@ The user is unable to filter the results by input or select a number of Total re
 Smart Foodie V1 is been develop as a single page web application. It connects with Google place API and Google Matrix API to get 60 nearby searches results based on what user input at start point box and calculate and return distance and drive time from the time user use this application.
 Application filter the display results when user unclicks in Price range form or and input in Review or/and Rate. Then the user is able to see results pins and a result table. 
 Click each result pin or result table will see the details of each location including:
+```
     Restaurant name with a clickable link to the original google page of this restaurant
     Drive time from now( if google API provides)
     Customer rating in stars and in a double number
@@ -22,5 +23,6 @@ Click each result pin or result table will see the details of each location incl
     Telephone number
     Restaurant address
     Restaurant website
+```
   
 
