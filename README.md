@@ -26,5 +26,8 @@ Click each result pin or result table will see the details of each location incl
     - Restaurant address
     - Restaurant website
 ```
-  
 
+## Prerequisites
+```
+Valid Google API key
+```
